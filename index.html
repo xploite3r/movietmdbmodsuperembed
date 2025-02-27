@@ -1,0 +1,85 @@
+<script>
+  ////////////////////// SUPEREMBED PLAYER SCRIPT //////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////// PLAYER SETTINGS ///////////////////////////////////////////////
+
+// do not change anything outside this section
+
+// player font - paste font name from Google fonts, replace spaces with +
+const playerFont = "Poppins";
+
+// player colors - paste color code in HEX format without # eg. 123456
+const playerBgColor = "000000"; // background color
+const playerFontColor = "ffffff"; // font color
+const playerPrimaryColor = "34cfeb"; // primary color for loader and buttons
+const playerSecondaryColor = "6900e0"; // secondary color for hovers and elements
+
+// player loader - you can choose a loading animation from 1 to 10
+const playerLoader = 1;
+
+// preferred server - you can choose server that will be on top of the list and open after
+// clicking play button, works only for quality >= 720p
+// options are: vidlox = 7, fembed = 11, mixdrop = 12, upstream = 17, videobin = 18,
+// doodstream = 21, streamtape = 25, streamsb = 26, voe = 29, ninjastream = 33
+const preferredServer = 0; // paste only server number, leave 0 for no preference
+
+// here you can choose source list style
+// 1 = button with server count and full page overlay with server list
+// 2 = button with icon and dropdown with server list
+const playerSourcesToggleType = 2;
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('video_id')) {
+    const videoId = urlParams.get('video_id');
+    let isTmdb = 0;
+    let season = 0;
+    let episode = 0;
+    let playerUrl = "";
+
+    if (urlParams.has('tmdb')) {
+        isTmdb = urlParams.get('tmdb');
+    }
+    if (urlParams.has('season')) {
+        season = urlParams.get('season');
+    } else if (urlParams.has('s')) {
+        season = urlParams.get('s');
+    }
+    if (urlParams.has('episode')) {
+        episode = urlParams.get('episode');
+    } else if (urlParams.has('e')) {
+        episode = urlParams.get('e');
+    }
+
+    if (videoId.trim() !== "") {
+        const requestUrl = `https://getsuperembed.link/?video_id=${videoId}&tmdb=${isTmdb}&season=${season}&episode=${episode}&player_font=${playerFont}&player_bg_color=${playerBgColor}&player_font_color=${playerFontColor}&player_primary_color=${playerPrimaryColor}&player_secondary_color=${playerSecondaryColor}&player_loader=${playerLoader}&preferred_server=${preferredServer}&player_sources_toggle_type=${playerSourcesToggleType}`;
+
+        fetch(requestUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Request server didn't respond");
+                }
+                return response.text();
+            })
+            .then(data => {
+                if (data.includes("https://")) {
+                    window.location.href = data;
+                } else {
+                    document.body.innerHTML += `<span style='color:red'>${data}</span>`;
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                document.body.innerHTML += "Request server didn't respond";
+            });
+    } else {
+        document.body.innerHTML += "Missing video_id";
+    }
+} else {
+    document.body.innerHTML += "Missing video_id";
+}
+
+
+</script>
